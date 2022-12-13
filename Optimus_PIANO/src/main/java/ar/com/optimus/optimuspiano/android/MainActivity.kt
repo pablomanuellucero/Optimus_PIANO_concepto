@@ -3,13 +3,12 @@ package ar.com.optimus.optimuspiano.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -18,20 +17,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-import ar.com.optimus.optimuspiano.Greeting
 import ar.com.optimus.optimuspiano.android.model.MusicItem
 import ar.com.optimus.optimuspiano.android.model.getSongs
-import coil.compose.*
-import io.ktor.client.*
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 @Composable
 fun MyApplicationTheme(
@@ -82,12 +79,13 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     //Greeting(Greeting().greeting())
-                    MusicList ()
+                    MusicList()
                 }
             }
         }
     }
 }
+
 @Composable
 fun Greeting(text: String) {
     Text(text = text)
@@ -101,42 +99,16 @@ fun DefaultPreview() {
     }
 }
 
-//@Preview (showBackground = true, widthDp = 200, heightDp = 100)
-@Composable
-fun TestComposable () {
-    Column {
-        AsyncImage(
-            model ="https://i.picsum.photos/id/766/200/300.jpg?hmac=yPmyGIdCe3ag8jlW87DzVijW_xLn1vzaiwrJvIChFcM",
-            contentDescription = null
-        )
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-
-        ) {
-            Text(
-                text = "Hola Optimus!",
-                modifier = Modifier
-                    .background(Color.Yellow)
-                    .border(width = 2.dp, color = Color.Blue)
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-                    .border(width = 2.dp, color = Color.Green)
-                    .background(Color.Gray)
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-                    .border(width = 2.dp, color = Color.Red)
-            )
-        }
-    }
-}
-
 //@Preview (showBackground = true)
 @Composable
-fun MusicListItem (item: MusicItem) {
-    Column {
-        Box (
+fun MusicListItem(item: MusicItem, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+    ) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height (400.dp),
+                .height(250.dp),
             contentAlignment = Alignment.Center
         ) {
             /*SubcomposeAsyncImage(
@@ -152,11 +124,21 @@ fun MusicListItem (item: MusicItem) {
                     SubcomposeAsyncImageContent()
                 }
             }*/
-            AsyncImage(
+            /*AsyncImage(
                 model = item.thumb,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize (),
                 contentDescription = null
+            )*/
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(item.thumb)
+                    .crossfade(true)
+                    .build(),
+                //placeholder = painterResource(coil.gif.R.drawable.abc_vector_test),
+                contentDescription = item.title, //stringResource(R.string.description),
+                //contentScale = ContentScale.Crop,
+                modifier = Modifier.requiredSize(250.dp)//.clip(CircleShape)
             )
             if (item.type == MusicItem.Type.SONG) {
                 Icon(
@@ -172,25 +154,28 @@ fun MusicListItem (item: MusicItem) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colors.secondary)
-                .padding (16.dp)
+                .padding(8.dp)
         ) {
             Text(
                 text = item.title,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.h6
             )
         }
     }
 }
 
-@Preview (showBackground = true)
+@Preview(showBackground = true)
 @Composable
-fun MusicList () {
-    LazyColumn (
+fun MusicList() {
+    LazyVerticalGrid(
         contentPadding = PaddingValues(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ){
-        items (getSongs ()) {item->
-            MusicListItem(item)
+        columns = GridCells.Adaptive(minSize = 204.dp)
+    ) {
+        items(getSongs()) { item ->
+            MusicListItem(item, Modifier.padding(2.dp))
         }
     }
 }
