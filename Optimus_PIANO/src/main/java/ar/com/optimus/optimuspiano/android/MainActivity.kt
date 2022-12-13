@@ -13,7 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +23,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ar.com.optimus.optimuspiano.android.model.MusicItem
@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     //Greeting(Greeting().greeting())
-                    MusicList()
+                    //SearchMusic()
                 }
             }
         }
@@ -167,15 +167,32 @@ fun MusicListItem(item: MusicItem, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
-fun MusicList() {
+fun MusicList(items: List<MusicItem>) {
     LazyVerticalGrid(
         contentPadding = PaddingValues(4.dp),
         columns = GridCells.Adaptive(minSize = 204.dp)
     ) {
-        items(getSongs()) { item ->
-            MusicListItem(item, Modifier.padding(2.dp))
+        items(items) { itm ->
+            MusicListItem(itm, Modifier.padding(2.dp))
         }
+    }
+}
+
+@Composable
+fun SearchMusic () {
+    var text by rememberSaveable {mutableStateOf ("")}
+    Column (
+    ) {
+        TextField (
+            value = text,
+            onValueChange = { text = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+        var items: List<MusicItem> = getSongs().filter{text == null || text.isEmpty() || it.title.lowercase().contains(text.lowercase())};
+        MusicList (items)
     }
 }
