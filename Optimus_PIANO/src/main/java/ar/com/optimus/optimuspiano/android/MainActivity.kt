@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -80,6 +82,21 @@ class MainActivity : ComponentActivity() {
                 ) {
                     //Greeting(Greeting().greeting())
                     //SearchMusic()
+                    Scaffold (
+                        topBar = {
+                            TopAppBar(
+                                title = {
+                                    Row {
+                                        Text(text = stringResource(id = R.string.app_name))
+                                        Spacer(modifier = Modifier.width(20.dp))
+                                        Icon (Icons.Default.Create, contentDescription = null)
+                                    }
+                                }
+                            )
+                        }
+                    ) { padding ->
+                        SearchMusic (modifier = Modifier.padding (padding))
+                    }
                 }
             }
         }
@@ -181,9 +198,10 @@ fun MusicList(items: List<MusicItem>) {
 }
 
 @Composable
-fun SearchMusic () {
+fun SearchMusic (modifier: Modifier = Modifier) {
     var text by rememberSaveable {mutableStateOf ("")}
     Column (
+        modifier = modifier
     ) {
         TextField (
             value = text,
@@ -192,7 +210,7 @@ fun SearchMusic () {
                 .fillMaxWidth()
                 .padding(8.dp)
         )
-        var items: List<MusicItem> = getSongs().filter{text == null || text.isEmpty() || it.title.lowercase().contains(text.lowercase())};
+        var items: List<MusicItem> = getSongs().filter{text.isEmpty() || it.title.lowercase().contains(text.lowercase())}
         MusicList (items)
     }
 }
