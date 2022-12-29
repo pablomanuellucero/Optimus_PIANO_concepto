@@ -45,6 +45,8 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.2.2")
     implementation("io.coil-kt:coil-svg:2.2.2")
     implementation("io.coil-kt:coil-video:2.2.2")
+    implementation("androidx.navigation:navigation-compose:2.5.2")
+    implementation("com.google.code.gson:gson:2.10")
 // List of artifacts, e.g.:
     //implementation("io.ktor:ktor-server-core-jvm:2.2.1")
     //implementation("io.ktor:ktor-server-netty-jvm:2.2.1")
